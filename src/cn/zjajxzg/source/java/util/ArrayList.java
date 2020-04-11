@@ -111,11 +111,13 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Default initial capacity.
+     * 默认初始容量
      */
     private static final int DEFAULT_CAPACITY = 10;
 
     /**
      * Shared empty array instance used for empty instances.
+     * 空数组  为什么要两个空数组呢？
      */
     private static final Object[] EMPTY_ELEMENTDATA = {};
 
@@ -123,26 +125,28 @@ public class ArrayList<E> extends AbstractList<E>
      * Shared empty array instance used for default sized empty instances. We
      * distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when
      * first element is added.
+     * 空数组
      */
     private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
 
     /**
-     * The array buffer into which the elements of the ArrayList are stored.
-     * The capacity of the ArrayList is the length of this array buffer. Any
+     * The capacity of th     * The array buffer into which the elements of the ArrayList are stored.e ArrayList is the length of this array buffer. Any
      * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
      * will be expanded to DEFAULT_CAPACITY when the first element is added.
+     * 真正存储元素的数组   不参与序列化
      */
     transient Object[] elementData; // non-private to simplify nested class access
 
     /**
      * The size of the ArrayList (the number of elements it contains).
-     *
+     * 数组中的元素个数
      * @serial
      */
     private int size;
 
     /**
      * Constructs an empty list with the specified initial capacity.
+     * 构造方法 参数是容量 也就是数组的长度
      *
      * @param  initialCapacity  the initial capacity of the list
      * @throws IllegalArgumentException if the specified initial capacity
@@ -150,10 +154,13 @@ public class ArrayList<E> extends AbstractList<E>
      */
     public ArrayList(int initialCapacity) {
         if (initialCapacity > 0) {
+            // 如果容量>0  创建一个长度为容量大小的数组
             this.elementData = new Object[initialCapacity];
         } else if (initialCapacity == 0) {
+            // 如果=0 使用空数组EMPTY_ELEMENTDATA
             this.elementData = EMPTY_ELEMENTDATA;
         } else {
+            // 如果<0 抛出异常
             throw new IllegalArgumentException("Illegal Capacity: "+
                                                initialCapacity);
         }
@@ -161,9 +168,14 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Constructs an empty list with an initial capacity of ten.
+     * 默认构造方法 使用
      */
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+    }
+
+    public int getCapacity() {
+        return elementData.length;
     }
 
     /**
@@ -220,10 +232,13 @@ public class ArrayList<E> extends AbstractList<E>
         }
     }
 
+    // 计算容量
     private static int calculateCapacity(Object[] elementData, int minCapacity) {
+        // 如果是空数组 返回默认容量
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             return Math.max(DEFAULT_CAPACITY, minCapacity);
         }
+        // 否则返回size+1
         return minCapacity;
     }
 
@@ -232,6 +247,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     private void ensureExplicitCapacity(int minCapacity) {
+        // 记录修改次数
         modCount++;
 
         // overflow-conscious code
@@ -244,6 +260,8 @@ public class ArrayList<E> extends AbstractList<E>
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
      * OutOfMemoryError: Requested array size exceeds VM limit
+     *
+     * 数组元素限制 有些虚拟机会在数组中保留头信息
      */
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
@@ -251,17 +269,26 @@ public class ArrayList<E> extends AbstractList<E>
      * Increases the capacity to ensure that it can hold at least the
      * number of elements specified by the minimum capacity argument.
      *
-     * @param minCapacity the desired minimum capacity
+     * 扩容 保证元素能够正常添加
+     *
+     * @param minCapacity the desired minimum capacity 扩容所需的最小容量
      */
     private void grow(int minCapacity) {
         // overflow-conscious code
+        // 有溢出意识的代码
+        // 扩容之前的容量 = 数组的长度
         int oldCapacity = elementData.length;
+        // 新的容量 = 原容量 + 原容量右移一位（即原容量/2 位运算效率更高） 即扩容1.5倍
         int newCapacity = oldCapacity + (oldCapacity >> 1);
+        // 如果扩容1.5倍之后还是不够 则直接将容量变为所需的容量
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity;
+        // 如果扩容之后的容量>最大容量限制（Integer.MAX_VALUE - 8 某些虚拟机可能会保留 header words）
         if (newCapacity - MAX_ARRAY_SIZE > 0)
+            // ???
             newCapacity = hugeCapacity(minCapacity);
         // minCapacity is usually close to size, so this is a win:
+        // 以新容量拷贝出一个新的数组
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
 
@@ -455,11 +482,14 @@ public class ArrayList<E> extends AbstractList<E>
     /**
      * Appends the specified element to the end of this list.
      *
+     * 添加元素到末尾
      * @param e element to be appended to this list
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean add(E e) {
+        // 检查是否需要扩容 当前元素个数+1
         ensureCapacityInternal(size + 1);  // Increments modCount!!
+        // 将元素添加到末尾
         elementData[size++] = e;
         return true;
     }
@@ -651,6 +681,8 @@ public class ArrayList<E> extends AbstractList<E>
      * runtime exception.  This method does *not* check if the index is
      * negative: It is always used immediately prior to an array access,
      * which throws an ArrayIndexOutOfBoundsException if index is negative.
+     *
+     * 校验索引是否超过size >=则抛出数组下标越界异常
      */
     private void rangeCheck(int index) {
         if (index >= size)
